@@ -1,0 +1,240 @@
+{
+  "title": "Seekrates Telemetry Database Schema",
+  "version": "1.3.0",
+  "updated": "2026-01-11",
+  "author": "D-C Session 86",
+  "description": "Unified schema for operational telemetry, billing, and LLM performance analytics",
+  
+  "tables": {
+    
+    "events": {
+      "description": "System events with GPS traceability",
+      "columns": {
+        "id": "INTEGER PRIMARY KEY AUTOINCREMENT",
+        "timestamp": "DATETIME DEFAULT CURRENT_TIMESTAMP",
+        "event_type": "TEXT NOT NULL",
+        "component": "TEXT NOT NULL",
+        "session_id": "TEXT",
+        "user_id": "TEXT",
+        "data": "JSON",
+        "severity": "TEXT DEFAULT 'INFO'",
+        "gps_coordinate": "TEXT"
+      },
+      "indexes": [
+        "CREATE INDEX idx_events_timestamp ON events(timestamp)",
+        "CREATE INDEX idx_events_type ON events(event_type)",
+        "CREATE INDEX idx_events_component ON events(component)",
+        "CREATE INDEX idx_events_session ON events(session_id)"
+      ]
+    },
+    
+    "metrics": {
+      "description": "Performance metrics with GPS traceability",
+      "columns": {
+        "id": "INTEGER PRIMARY KEY AUTOINCREMENT",
+        "timestamp": "DATETIME DEFAULT CURRENT_TIMESTAMP",
+        "metric_name": "TEXT NOT NULL",
+        "metric_value": "REAL NOT NULL",
+        "unit": "TEXT",
+        "component": "TEXT",
+        "session_id": "TEXT",
+        "tags": "JSON"
+      },
+      "indexes": [
+        "CREATE INDEX idx_metrics_timestamp ON metrics(timestamp)",
+        "CREATE INDEX idx_metrics_name ON metrics(metric_name)"
+      ]
+    },
+    
+    "errors": {
+      "description": "Error tracking with resolution status",
+      "columns": {
+        "id": "INTEGER PRIMARY KEY AUTOINCREMENT",
+        "timestamp": "DATETIME DEFAULT CURRENT_TIMESTAMP",
+        "error_type": "TEXT NOT NULL",
+        "error_message": "TEXT",
+        "stack_trace": "TEXT",
+        "component": "TEXT",
+        "gps_coordinate": "TEXT",
+        "session_id": "TEXT",
+        "resolved": "BOOLEAN DEFAULT 0",
+        "resolution_notes": "TEXT"
+      },
+      "indexes": [
+        "CREATE INDEX idx_errors_timestamp ON errors(timestamp)",
+        "CREATE INDEX idx_errors_type ON errors(error_type)",
+        "CREATE INDEX idx_errors_resolved ON errors(resolved)"
+      ]
+    },
+    
+    "sessions": {
+      "description": "User session tracking",
+      "columns": {
+        "session_id": "TEXT PRIMARY KEY",
+        "start_time": "DATETIME DEFAULT CURRENT_TIMESTAMP",
+        "end_time": "DATETIME",
+        "user_id": "TEXT",
+        "environment": "TEXT",
+        "metadata": "JSON"
+      },
+      "indexes": [
+        "CREATE INDEX idx_sessions_user ON sessions(user_id)",
+        "CREATE INDEX idx_sessions_start ON sessions(start_time)"
+      ]
+    },
+    
+    "customers": {
+      "description": "User accounts linked to Stripe - includes T&C acceptance",
+      "version_note": "v1.3.0: Added tc_accepted_at, tc_version",
+      "columns": {
+        "id": "INTEGER PRIMARY KEY AUTOINCREMENT",
+        "email": "TEXT UNIQUE NOT NULL",
+        "stripe_customer_id": "TEXT",
+        "tier": "TEXT DEFAULT 'seeker'",
+        "use_case": "TEXT",
+        "tc_accepted_at": "DATETIME",
+        "tc_version": "TEXT",
+        "created_at": "DATETIME DEFAULT CURRENT_TIMESTAMP",
+        "updated_at": "DATETIME DEFAULT CURRENT_TIMESTAMP"
+      },
+      "indexes": [
+        "CREATE INDEX idx_customers_email ON customers(email)",
+        "CREATE INDEX idx_customers_stripe ON customers(stripe_customer_id)",
+        "CREATE INDEX idx_customers_tier ON customers(tier)"
+      ]
+    },
+    
+    "subscriptions": {
+      "description": "Stripe subscription tracking",
+      "columns": {
+        "id": "INTEGER PRIMARY KEY AUTOINCREMENT",
+        "customer_id": "INTEGER REFERENCES customers(id)",
+        "stripe_subscription_id": "TEXT UNIQUE",
+        "stripe_customer_id": "TEXT",
+        "tier": "TEXT",
+        "status": "TEXT",
+        "current_period_start": "DATETIME",
+        "current_period_end": "DATETIME",
+        "created_at": "DATETIME DEFAULT CURRENT_TIMESTAMP",
+        "updated_at": "DATETIME DEFAULT CURRENT_TIMESTAMP"
+      },
+      "indexes": [
+        "CREATE INDEX idx_subscriptions_customer ON subscriptions(customer_id)",
+        "CREATE INDEX idx_subscriptions_stripe ON subscriptions(stripe_subscription_id)",
+        "CREATE INDEX idx_subscriptions_status ON subscriptions(status)"
+      ],
+      "status_values": ["active", "canceled", "past_due", "trialing"]
+    },
+    
+    "consensus_results": {
+      "description": "Query history for rate limiting (no raw query text)",
+      "columns": {
+        "id": "INTEGER PRIMARY KEY AUTOINCREMENT",
+        "timestamp": "DATETIME DEFAULT CURRENT_TIMESTAMP",
+        "customer_id": "INTEGER REFERENCES customers(id)",
+        "query_hash": "TEXT",
+        "tier": "TEXT",
+        "provider_count": "INTEGER",
+        "convergence_percentage": "REAL",
+        "champion_provider": "TEXT",
+        "processing_time_ms": "INTEGER"
+      },
+      "indexes": [
+        "CREATE INDEX idx_consensus_timestamp ON consensus_results(timestamp)",
+        "CREATE INDEX idx_consensus_customer ON consensus_results(customer_id)"
+      ]
+    },
+    
+    "llm_performance": {
+      "description": "Anonymized LLM performance metrics - SELLABLE DATA",
+      "version_note": "v1.3.0: New table for LLM analytics product",
+      "business_value": "Sellable to LLM providers and AI app builders",
+      "pii_status": "NONE - fully anonymized",
+      "columns": {
+        "id": "INTEGER PRIMARY KEY AUTOINCREMENT",
+        "timestamp": "DATETIME DEFAULT CURRENT_TIMESTAMP",
+        "query_hash": "TEXT",
+        "query_category": "TEXT",
+        "provider": "TEXT NOT NULL",
+        "score": "INTEGER",
+        "confidence": "REAL",
+        "was_champion": "BOOLEAN",
+        "convergence_count": "INTEGER",
+        "convergence_percentage": "REAL",
+        "response_time_ms": "INTEGER",
+        "token_count": "INTEGER",
+        "tier": "TEXT",
+        "refusal": "BOOLEAN DEFAULT 0"
+      },
+      "indexes": [
+        "CREATE INDEX idx_llm_perf_timestamp ON llm_performance(timestamp)",
+        "CREATE INDEX idx_llm_perf_provider ON llm_performance(provider)",
+        "CREATE INDEX idx_llm_perf_champion ON llm_performance(was_champion)",
+        "CREATE INDEX idx_llm_perf_category ON llm_performance(query_category)"
+      ],
+      "provider_values": ["openai", "claude", "gemini", "mistral", "cohere"],
+      "analytics_queries": {
+        "champion_rate_by_provider": "SELECT provider, COUNT(*) as total, SUM(was_champion) as wins, ROUND(100.0 * SUM(was_champion) / COUNT(*), 2) as win_rate FROM llm_performance GROUP BY provider",
+        "avg_score_by_provider": "SELECT provider, ROUND(AVG(score), 2) as avg_score, ROUND(AVG(confidence), 2) as avg_confidence FROM llm_performance GROUP BY provider",
+        "refusal_rate_by_provider": "SELECT provider, COUNT(*) as total, SUM(refusal) as refusals, ROUND(100.0 * SUM(refusal) / COUNT(*), 2) as refusal_rate FROM llm_performance GROUP BY provider",
+        "performance_over_time": "SELECT DATE(timestamp) as date, provider, ROUND(AVG(score), 2) as avg_score FROM llm_performance GROUP BY date, provider ORDER BY date"
+      }
+    },
+    
+    "sage_waitlist": {
+      "description": "Sage tier waitlist signups",
+      "columns": {
+        "id": "INTEGER PRIMARY KEY AUTOINCREMENT",
+        "email": "TEXT NOT NULL",
+        "use_case": "TEXT NOT NULL",
+        "created_at": "DATETIME DEFAULT CURRENT_TIMESTAMP",
+        "notified": "BOOLEAN DEFAULT 0"
+      },
+      "indexes": [
+        "CREATE INDEX idx_waitlist_email ON sage_waitlist(email)"
+      ]
+    }
+  },
+  
+  "version_history": [
+    {
+      "version": "1.3.0",
+      "date": "2026-01-11",
+      "author": "D-C Session 86",
+      "changes": [
+        "Added tc_accepted_at, tc_version to customers table",
+        "Added llm_performance table for sellable LLM analytics",
+        "Added query_category to llm_performance for segmentation",
+        "Added analytics_queries examples to llm_performance"
+      ]
+    },
+    {
+      "version": "1.2.0",
+      "date": "2026-01-03",
+      "author": "D-C Session 78",
+      "changes": [
+        "Added customers table (Stripe integration)",
+        "Added subscriptions table",
+        "Added consensus_results table",
+        "Added sage_waitlist table"
+      ]
+    },
+    {
+      "version": "1.1.0",
+      "date": "2025-10-14",
+      "author": "Claude",
+      "changes": [
+        "Added GPS traceability to events and errors",
+        "Added indexes for performance"
+      ]
+    },
+    {
+      "version": "1.0.0",
+      "date": "2025-10-01",
+      "author": "Claude",
+      "changes": [
+        "Initial schema: events, metrics, errors, sessions"
+      ]
+    }
+  ]
+}

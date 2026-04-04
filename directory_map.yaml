@@ -1,0 +1,684 @@
+# =============================================================================
+# SCRIPT DNA METADATA - GPS FOUNDATION COMPLIANT
+# =============================================================================
+# project_name: "decision_referee"
+# module_name: "System Infrastructure"
+# script_id: "fr_04_uc_002_ec_01_tc_002"
+# gps_coordinate: "fr_04_uc_002_ec_01_tc_002"
+# script_name: "directory_map.yaml"
+# template_version: "0002.00.00"
+# status: "Production"
+
+# =========================================
+#  Mailman Agent Directory Map - Complete Ecosystem
+# =========================================
+# 
+# This directory map is the living memory blueprint of Mailman Agent.
+# It governs how data, code, templates, and results are organized.
+# 
+#  Key Rules:
+# - Logical separation is enforced at the mapping level
+# - No physical file moves unless system evolution demands it
+# - Folder purposes must be explicit and documented
+# - Scripts are responsible for filtering and handling only relevant file types
+# 
+#  Future Evolution:
+# - If deeper folder separation becomes necessary, it will be managed first
+#   through directory_map.yaml and tested before any physical moves
+# 
+#  Mailman Agent grows, heals, and regenerates based on structured memory  not static paths
+# 
+# =========================================
+
+# =============================================================================
+#  STATIC GROUNDING CONFIGURATION (Required for good_night.py)
+# =============================================================================
+redis_url: "redis://localhost:6379/15"
+static_grounding_root: "_deploy/static_grounding"
+curated_search_root: "_deploy/static_grounding/curated_search"
+chunks_root: "_deploy/static_grounding/chunks"
+logs_dir: "logs"
+export_manifest_path: "_deploy/static_grounding/manifest.json"
+
+# =============================================================================
+#  DIRECTORY MAP SELF-REFERENCE
+# =============================================================================
+# QUICK ACCESS KEYS (for path_resolver compatibility)
+agent_responses_db: data/agent_responses.db
+llm_transactions_db: data/llm_transactions.db
+llm_requests_db: data/llm_requests.db
+simulation_traps_yaml: docs/simulation_traps.yaml
+sample_input_json: docs/test_inputs/sample_input.json
+
+# Boot Recovery Protocol
+boot_recovery_protocol: docs/flow_control/boot_recovery.yaml
+hydration_recovery_protocol: docs/flow_control/hydration_recovery.yaml
+
+#  CORRECT - Root level keys (move these up)
+consensus_engine: src/agents/consensus_engine.py
+consensus_config: src/core/consensus_config.py
+event_store: src/core/event_store.py
+consensus_events: src/core/consensus_events.py
+response_parser: src/core/response_parser.py
+confidence_scorer: src/core/confidence_scorer.py
+conflict_resolver: src/core/conflict_resolver.py
+
+
+# Self-Reference (Meta)
+directory_map:
+  map_file: directory_map.yaml
+  map_location: ./directory_map.yaml
+  map_version: "2.0.0"
+  path_resolver: src/utils/path_resolver.py
+  config_loader: src/utils/config_loader.py
+  config_file: templates/claude_memory_config.yaml
+
+# Project Root
+project_root: .
+project_name: mailman_agent_new
+
+# =============================================================================
+#  COGNITION FRAMEWORK
+# =============================================================================
+cognition_framework:
+  non_deletable_cognition: "docs/non_deletable_cognition.yaml"
+  cognitive_whiteboard: "src/cognitive_whiteboard/"
+  cognition_validation: "src/core/cognition_validator.py"
+
+models: models.py
+database_manager: src/core/database_manager.py
+# =============================================================================
+#  ENVIRONMENT & SECRETS MANAGEMENT  
+# =============================================================================
+# Add these to directory_map.yaml
+
+# Database directory as top-level entry
+database_dir: ".database"
+
+# Templates directory
+templates: "templates"
+
+# Telemetry framework section (similar to cognition_framework)
+telemetry_framework:
+  telemetry_logger: "src/telemetry/telemetry_logger.py"
+  telemetry_db: ".database/telemetry.db"
+  telemetry_schema: "docs/telemetry/schema/telemetry_schema.json"  # <- Change this line
+  telemetry_module: "src/telemetry/"
+
+# Or if you prefer flat structure for these:
+telemetry: "src/telemetry"
+database: ".database"
+  # optional: require_profile: "publisher"
+config:
+  libraries: required_libraries.json
+  redis_config: config/redis_config.json
+
+# Environment Configuration
+environment_config:
+  env_file: config/environments/.env
+  secrets_manager: src/utils/secrets_manager.py
+  config_loader: src/utils/config_loader.py
+
+# Email Configuration (structure, not secrets)
+email_config:
+  smtp_server: smtp.gmail.com
+  smtp_port: 587
+  from_name: "Decision Referee Agent"
+  notification_types: ["completion", "sos", "consensus"]
+  max_attachments: 3
+  attachment_size_limit: "10MB"
+
+# System Configuration  
+system_config:
+  max_token_budget: 20000
+  consensus_threshold_default: 95
+  gps_error_tracking: enabled
+  cache_ttl_seconds: 3600
+  database_connection_pool_size: 10
+  libraries: config/required_libraries.json
+
+# Memory Configuration
+memory:
+  hydration_package_gemini: memory/hydration_upload_package_claude.json
+
+# =============================================================================
+#  DATABASE INFRASTRUCTURE 
+# =============================================================================
+claude_memory_config: "templates/claude_memory_config.yaml"
+
+# Database Root Directory
+databases_root: data/databases
+
+# Redis Configuration
+redis:
+  host: localhost
+  port: 6379
+  password: null
+  db: 15
+
+# Core System Databases (Created by templates when needed)
+databases:
+  # Event Sourcing Infrastructure
+  event_store_db: data/databases/event_store.db
+  checkpoints_db: data/databases/checkpoints.db
+  
+  # GPS Foundation Databases
+  gps_errors_db: data/databases/gps_errors.db
+  error_patterns_db: data/databases/error_patterns.db
+  fix_strategies_db: data/databases/fix_strategies.db
+  
+  # Multi-Agent Consensus
+  agent_interactions_db: data/databases/agent_interactions.db
+  consensus_results_db: data/databases/consensus_results.db
+  
+  # Performance & Monitoring
+  metrics_db: data/databases/metrics.db
+  performance_db: data/databases/performance.db
+  
+  # Testing Infrastructure
+  test_results_db: data/databases/test_results.db
+  test_data_db: data/databases/test_data.db
+  
+  # Agent Code Management
+  agent_code_db: data/databases/agent_code.db
+  script_dna_db: data/databases/script_dna.db
+  
+  # Legacy/Migration Support
+  aaa_b_db: data/databases/aaa_b.db
+
+# Database Utilities
+database_utilities:
+  backups_dir: data/databases/backups
+  migrations_dir: data/databases/migrations
+  schemas_dir: data/databases/schemas
+  seeds_dir: data/databases/seeds
+
+# Templates
+templates:
+  database_schemas:
+    test_results_db: "templates/test_results_db_schema.sql"
+    cognition_tracking: "templates/test_results_db_schema.sql"
+  
+database_schemas:
+  test_results_db:
+    template_path: "templates/test_results_db_schema.sql"
+    description: "Cognition test results and agent status tracking"
+    version: "1.0.0"
+    tables: ["cognition_events", "agent_cognition_status", "cognition_benchmarks"]
+
+# =============================================================================
+#  SOURCE CODE STRUCTURE
+# =============================================================================
+
+# Source Code Root
+source_root: src
+src: src
+
+# Core Modules (GPS Foundation + Multi-Agent)
+core_modules:
+  core_root: src/core
+  event_store: src/core/event_store.py
+  database_manager: src/core/database_manager.py
+  projection_manager: src/core/projection_manager.py
+  cache_manager: src/core/cache_manager.py
+  cache_invalidation: src/core/cache_invalidation.py
+  
+  # GPS Foundation Core
+  gps_error_tracker: src/core/gps_error_tracker.py
+  error_pattern_db: src/core/error_pattern_db.py
+  autonomous_autofix: src/core/autonomous_autofix.py
+  code_surgery: src/core/code_surgery.py
+  
+  # Multi-Agent Consensus
+  consensus_engine: src/core/consensus_engine.py
+  consensus_types: src/core/consensus_types.py
+  consensus_config: src/core/consensus_config.py
+  consensus_events: src/core/consensus_events.py
+  response_parser: src/core/response_parser.py
+  confidence_scorer: src/core/confidence_scorer.py
+  conflict_resolver: src/core/conflict_resolver.py
+  
+  # Pipeline Orchestration
+  pipeline_orchestrator: src/core/pipeline_orchestrator.py
+  checkpoint_manager: src/core/checkpoint_manager.py
+
+# Agent Framework
+agents:
+  agents_root: src/agents
+  base_agent: src/agents/base_agent.py
+  openai_agent: src/agents/openai_agent.py
+  ollama_agent: src/agents/ollama_agent.py
+  agent_factory: src/agents/agent_factory.py
+
+# Generation Engines
+generators:
+  generators_root: src/generators
+  hlr_generator: src/generators/hlr_generator.py
+  fr_generator: src/generators/fr_generator.py
+  uc_generator: src/generators/uc_generator.py
+  ec_generator: src/generators/ec_generator.py
+  test_generator: src/generators/test_generator.py
+  db_schema_generator: src/generators/db_schema_generator.py
+
+# Transformers (Pipeline Steps)
+transformers:
+  transformers_root: src/transformers
+  hlr_to_fr: src/transformers/hlr_to_fr_transformer.py
+  fr_to_uc: src/transformers/fr_to_uc_transformer.py
+  uc_to_ec: src/transformers/uc_to_ec_transformer.py
+  uc_to_tc: src/transformers/uc_to_tc_transformer.py
+
+# Validation Framework
+validation:
+  validation_root: src/validation
+  test_framework: src/validation/test_framework.py
+  golden_dataset: src/validation/golden_dataset.py
+  entropy_tracker: src/validation/entropy_tracker.py
+  template_manager: src/validation/template_manager.py
+
+# Observability & Monitoring
+observability:
+  observability_root: src/observability
+  metrics_collector: src/observability/metrics_collector.py
+  drift_detector: src/observability/drift_detector.py
+  dashboard: src/observability/dashboard.py
+  alerting: src/observability/alerting.py
+
+# Utilities
+utilities:
+  utils_root: src/utils
+  path_resolver: src/utils/path_resolver.py
+  config_loader: src/utils/config_loader.py
+  error_handling: src/utils/error_handling.py
+  logging_config: src/utils/logging_config.py
+  cleanup_backup_files: src/utils/cleanup_backup_files.sh
+  secrets_manager: src/utils/secrets_manager.py
+
+# Tools & Scripts
+tools:
+  tools_root: src/tools
+  infrastructure_health_check: src/tools/infrastructure_health_check.py
+  database_tools: src/tools/database_tools.py
+  cache_tools: src/tools/cache_tools.py
+
+# API Layer
+api:
+  api_root: src/api
+  rest_api: src/api/rest_api.py
+  endpoints_root: src/api/endpoints
+  generation_endpoints: src/api/endpoints/generation.py
+  status_endpoints: src/api/endpoints/status.py
+
+# CLI Interface
+cli:
+  cli_root: src/cli
+  build_agent_cli: src/cli/build_agent_cli.py
+  commands_root: src/cli/commands
+  generate_command: src/cli/commands/generate.py
+  validate_command: src/cli/commands/validate.py
+  monitor_command: src/cli/commands/monitor.py
+
+# =============================================================================
+#  TEMPLATE ECOSYSTEM
+# =============================================================================
+
+# Templates Root
+templates_root: templates
+templates: templates
+
+# Core Canonized Templates (7 Templates)
+core_templates:
+  hlr_template: templates/hlr_template.yaml
+  script_dna_template: templates/script_dna_template.yaml
+  fr_template: templates/fr_template.yaml
+  uc_template: templates/uc_template.yaml
+  db_schema_template: templates/db_schema_template.yaml
+  agent_script_template: templates/agent_script_template.yaml
+  test_script_template: templates/test_script_template.yaml
+
+# Specialized Templates
+specialized_templates:
+  directory_map_template: templates/directory_map_template.yaml
+  agent_deployment_metadata: templates/agent_deployment_metadata_template.yaml
+  llm_prompt_template: templates/llm_prompt_template.yaml
+  test_case_block: templates/test_case_block.yaml
+
+# Template Utilities
+template_utilities:
+  master_frs: templates/master_frs.yaml
+  use_cases_per_hlr: templates/use_cases_per_hlr.yaml
+  reply_templates: templates/replies
+
+# Deployment Templates
+deployment_templates:
+  deployment_metadata: templates/deployment_metadata.yaml
+  run_all_template: templates/run_all_template.j2
+  dockerfile: templates/Dockerfile
+  fly_toml: templates/fly.toml
+
+# =============================================================================
+#  DATA STORAGE STRUCTURE
+# =============================================================================
+
+# Data Root
+data_root: data
+data: data
+
+# Input Data (Requirements & Specifications)
+input_data:
+  hlr_data: data/hlr
+  fr_data: data/fr
+  uc_data: data/uc
+  fr_uc_data: data/fr_uc_data
+  high_level_requirements: data/hlr
+
+# Generated Output Data
+output_data:
+  generated_agents: data/generated/agents
+  generated_tests: data/generated/tests
+  generated_schemas: data/generated/schemas
+  generated_docs: data/generated/docs
+
+# Test Data Infrastructure
+test_data:
+  test_data_root: data/test_data
+  test_inputs: data/test_data/inputs
+  test_outputs: data/test_data/outputs
+  test_fixtures: data/test_data/fixtures
+  golden_dataset: data/test_data/golden
+
+# Cache & Performance Data
+cache_data:
+  cache_root: data/cache
+  projection_cache: data/cache/projections
+  consensus_cache: data/cache/consensus
+  performance_cache: data/cache/performance
+
+# Backup & Recovery
+backup_data:
+  backup_root: data/backups
+  fallback_archives: data/fallback_archives
+  session_archives: data/backups/sessions
+  checkpoint_backups: data/backups/checkpoints
+
+# Working Data
+working_data:
+  temp_root: data/temp
+  processing: data/temp/processing
+  validation: data/temp/validation
+  staging: data/temp/staging
+
+# =============================================================================
+#  TESTING INFRASTRUCTURE
+# =============================================================================
+
+# Tests Root
+tests_root: tests
+tests: tests
+
+# Test Categories
+test_structure:
+  unit_tests: tests/unit
+  integration_tests: tests/integration
+  system_tests: tests/system
+  performance_tests: tests/performance
+  
+  # GPS Foundation Tests
+  gps_tests: tests/gps_foundation
+  error_tracking_tests: tests/gps_foundation/error_tracking
+  autonomous_fix_tests: tests/gps_foundation/autonomous_fix
+  
+  # Multi-Agent Tests
+  consensus_tests: tests/consensus
+  agent_tests: tests/agents
+  
+  # Pipeline Tests
+  pipeline_tests: tests/pipeline
+  transformation_tests: tests/transformations
+  
+  # Template Tests
+  template_tests: tests/templates
+  
+  # Infrastructure Tests
+  database_tests: tests/infrastructure/database
+  cache_tests: tests/infrastructure/cache
+  event_store_tests: tests/infrastructure/event_store
+
+# Test Utilities
+test_utilities:
+  conftest: tests/conftest.py
+  fixtures: tests/fixtures
+  mocks: tests/mocks
+  test_helpers: tests/helpers
+
+# =============================================================================
+#  DOCUMENTATION STRUCTURE
+# =============================================================================
+
+# Documentation Root
+docs_root: docs
+docs: docs
+
+# Core Documentation
+core_docs:
+  architecture: docs/architecture.md
+  methodology: docs/methodology.md
+  api_reference: docs/api_reference.md
+  gps_foundation: docs/gps_foundation.md
+  consensus_engine: docs/consensus_engine.md
+
+# Specifications
+specifications:
+  hlr_specs: docs/specifications/hlr
+  fr_specs: docs/specifications/fr
+  uc_specs: docs/specifications/uc
+  requirements_docs: docs/functional_requirements
+
+# Operational Documentation
+operational_docs:
+  runbooks: docs/runbooks
+  deployment_guide: docs/runbooks/deployment.md
+  troubleshooting: docs/runbooks/troubleshooting.md
+  monitoring_guide: docs/runbooks/monitoring.md
+
+# Reference Documentation
+reference_docs:
+  use_cases_doc: docs/use_cases
+  use_cases_output: docs/use_cases
+  use_cases_per_hlr_docs: docs/use_cases_per_hlr.yaml
+  long_term_doc: docs/long_term
+  saved_context: docs/saved_context.yaml
+  spirit_log: docs/spirit_log.yaml
+  checklists: docs/checklists
+
+# Deployment Documentation
+deployment_docs:
+  deployment_specs: docs/deployment_specs.yaml
+  deployment_logs: docs/deployment_logs
+
+# Examples & Tutorials
+examples_docs:
+  examples_root: docs/examples
+  sample_hlr_to_agent: docs/examples/sample_hlr_to_agent.md
+  consensus_failure_handling: docs/examples/consensus_failure_handling.md
+
+# =============================================================================
+#  OUTPUT & RESULTS STRUCTURE
+# =============================================================================
+
+# Generated Output Root
+output_root: outputs
+outputs: outputs
+
+# Generated Code Outputs
+generated_code:
+  agents_output: outputs/agents
+  tests_output: outputs/tests
+  schemas_output: outputs/schemas
+  scripts_output: outputs/scripts
+
+# Processing Results
+processing_results:
+  consensus_results: outputs/consensus
+  validation_results: outputs/validation
+  performance_results: outputs/performance
+  error_analysis: outputs/errors
+
+# Reports & Analytics
+reports:
+  reports_root: outputs/reports
+  daily_reports: outputs/reports/daily
+  weekly_reports: outputs/reports/weekly
+  performance_reports: outputs/reports/performance
+  sla_reports: outputs/reports/sla
+
+# Deployment Outputs
+deployment_outputs:
+  deploy_outputs: deploy_outputs
+  deployment_artifacts: outputs/deployment
+  container_images: outputs/deployment/images
+  configuration_files: outputs/deployment/configs
+
+# =============================================================================
+#  INTEGRATION & COMMUNICATION
+# =============================================================================
+
+# External Integration
+integration:
+  inbox_emails: tagged_emails
+  tagged_emails: tagged_emails
+  external_apis: data/integration/apis
+  webhooks: data/integration/webhooks
+
+# Logs & Monitoring
+logging:
+  logs_root: logs 
+  logs: logs
+  application_logs: logs/application
+  error_logs: logs/errors
+  performance_logs: logs/performance
+  audit_logs: logs/audit
+
+# Configuration
+configuration:
+  config_root: config
+  environments: config/environments
+  development_config: config/environments/development.yaml
+  testing_config: config/environments/testing.yaml
+  production_config: config/environments/production.yaml
+
+# =============================================================================
+#  EXECUTION & DEPLOYMENT
+# =============================================================================
+
+# Execution Scripts
+execution_scripts:
+  scripts_root: scripts
+  scripts: scripts
+  setup_scripts: scripts/setup
+  migration_scripts: scripts/migrations
+  maintenance_scripts: scripts/maintenance
+  run_full_hydration_pipeline: run_full_hydration_pipeline.py
+  
+  # Core System Scripts
+  good_morning: good_morning.py
+  good_night: good_night.py
+  setup_env: setup_env.py
+  validation_script: validation_script.py
+
+# Deployment Infrastructure
+deployment:
+  deploy_root: .
+  dockerfile: Dockerfile
+  docker_compose: docker-compose.yml
+  fly_toml: fly.toml
+  kubernetes: deployment/kubernetes
+  
+  # Deployment Scripts
+  run_agent: templates/run_agent.sh
+  run_all: templates/run_all_template.j2
+
+# Environment Management
+environment:
+  virtual_env: venv
+  env_template: .env.template
+  env_files: .env.*
+  requirements: requirements.txt
+
+# =============================================================================
+#  SECURITY & SECRETS
+# =============================================================================
+s3_publish:
+  bucket: "seekrates-ai-grounding"
+  region: "ap-southeast-2"
+  prefix_root: "gs"
+  ttl_seconds: 14400
+
+
+# Security
+security:
+  secrets_manager: src/utils/secrets_manager.py
+  api_keys: config/secrets  # Not in repo
+  certificates: config/certs  # Not in repo
+  
+# =============================================================================
+#  MONITORING & OBSERVABILITY
+# =============================================================================
+
+# Monitoring Data
+monitoring:
+  metrics_data: data/metrics
+  health_checks: data/health
+  performance_data: data/performance
+  sla_tracking: data/sla
+
+# Dashboard Data
+dashboard:
+  dashboard_data: data/dashboard
+  real_time_metrics: data/dashboard/realtime
+  historical_data: data/dashboard/historical
+
+# Files Configuration
+files:
+  script_dna:
+    path: src/cognitive_whiteboard/script_dna.yaml
+  script_registry:
+    path: docs/script_registry.yaml
+  directory_map:
+    path: directory_map.yaml
+telemetry_events_file: _telemetry/events.jsonl
+
+
+# ROOT PATH MAPPING (REQUIRED)
+'/': '.'
+'src/': 'src/'
+'tests/': 'tests/'
+'docs/': 'docs/'
+'templates/': 'templates/'
+'scripts/': 'scripts/'
+'tools/': 'tools/'
+'config/': 'config/'
+'logs/': 'logs/'
+'data/': 'data/'
+
+# =============================================================================
+#  IMMUTABLE DIRECTORY MAP PRINCIPLE
+# =============================================================================
+#
+# CORE RULES:
+# - Do not change or delete existing keys
+# - Only add new keys when needed  
+# - Maintain memory stability
+# - All databases consolidated in data/databases/
+# - All templates in templates/
+# - All generated output in outputs/
+# - All documentation in docs/
+# - All source code in src/
+# - All tests in tests/
+# - All data in data/
+#
+# VERSION: 2.0.0
+# LAST_UPDATED: 2025-06-10
+# CANONIZATION_STATUS: READY_FOR_EXECUTION
+# 
+# =========================================

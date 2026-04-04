@@ -1,0 +1,521 @@
+# =============================================================================
+# SEEKRATES AI - PRICING TIERS v4.0.0
+# =============================================================================
+# File: config/pricing_tiers_v4.yaml
+# Version: 4.0.0
+# Updated: 2025-12-14
+# Author: D-C (Designer Claude)
+# Status: PROPOSED - Launch after Jan 2 review
+# Change: Path B models + generous PAYG token limits
+# =============================================================================
+# =============================================================================
+# CHANGELOG ENTRY — insert into version_history section of pricing_tiers.yaml
+# =============================================================================
+#
+#   - version: "4.1.0"
+#     date: "2026-02-26"
+#     author: "D-C (Designer Claude)"
+#     changes:
+#       - "Upgraded Claude consensus voice from claude-3-haiku-20240307 to
+#          claude-haiku-3-5 — zero cost impact, improved instruction-following
+#          and nuance in consensus pool inputs to Sonnet synthesis"
+#
+# =============================================================================
+# INLINE COMMENT — replace the claude line in models_used section:
+# =============================================================================
+#
+#   BEFORE:
+#     claude: "claude-3-haiku-20240307"  # was claude-sonnet-4-5
+#
+#   AFTER:
+#     claude: "claude-haiku-3-5"         # upgraded from claude-3-haiku-20240307 (2026-02-26)
+#                                        # cost-neutral; improved instruction-following
+#                                        # synthesis voice (claude-sonnet-4-5) unchanged
+#
+# =============================================================================
+# =============================================================================
+# COST BASIS (Path B - Cheaper Models)
+# =============================================================================
+cost_basis:
+  effective_date: "2025-12-14"
+  model_configuration: "Path B (All Cheaper Models)"
+  
+  models_used:
+    openai: "gpt-4o-mini"           # was gpt-4-turbo
+    claude: "claude-3-haiku-20240307"  # was claude-sonnet-4-5
+    gemini: "gemini-2.0-flash"         # unchanged
+    mistral: "mistral-small-latest"    # was mistral-large
+    cohere: "command-r"                # was command-r-plus
+    synthesis: "claude-sonnet-4-5"     # KEPT for quality
+  
+  combined_rates_per_1m:
+    input: 1.175    # $0.50 + $0.25 + $0.075 + $0.20 + $0.15
+    output: 4.25    # $1.50 + $1.25 + $0.30 + $0.60 + $0.60
+    
+  per_1k_tokens:
+    input: 0.001175
+    output: 0.00425
+    
+  synthesis_cost:
+    # Synthesis uses Sonnet: ~500 in, ~1000 out
+    per_query: 0.0165
+    
+  total_cost_per_query:
+    minimal: 0.008      # 1K in, 1K out + synthesis
+    typical: 0.029      # 3K in, 2K out + synthesis
+    generous: 0.053     # 6K in, 4K out + synthesis
+    maximum: 0.090      # 10K in, 8K out + synthesis
+
+# =============================================================================
+# TOKEN-TO-WORD CONVERSION (Reference)
+# =============================================================================
+token_reference:
+  ratio: "1 token ≈ 0.75 words"
+  examples:
+    1000_tokens: "~750 words (~1.5 pages)"
+    1500_tokens: "~1,125 words (~2.5 pages)"
+    4000_tokens: "~3,000 words (~6 pages)"
+    8000_tokens: "~6,000 words (~12 pages)"
+
+# =============================================================================
+# TIER 1: FREE (Lead Generation)
+# =============================================================================
+free_tier:
+  name: "Explorer"
+  price: "$0"
+  
+  limits:
+    queries_per_day: 5
+    queries_per_month: 100
+    max_input_tokens: 1000
+    max_output_tokens: 1500
+    
+  # Word equivalents
+  word_limits:
+    max_input: "~750 words"
+    max_output: "~1,125 words"
+    
+  economics:
+    cost_per_query: 0.008
+    max_monthly_cost: 0.80    # 100 × $0.008
+    acceptable: true           # Low CAC
+    
+  features:
+    - "5 AI models per query"
+    - "Email delivery"
+    - "Consensus validation"
+    - "7-day query history"
+    
+  upgrade_cta: |
+    You've used your free queries!
+    Unlock unlimited access from just $0.15 per question.
+    Or subscribe from $19/month for even better value.
+
+# =============================================================================
+# TIER 2: PAY-AS-YOU-GO (Credit Card Required)
+# =============================================================================
+pay_as_you_go:
+  name: "Pay As You Go"
+  registration_required: true
+  credit_card_required: true
+  minimum_purchase: null
+  
+  # ---------------------------------------------------------------------------
+  # SIMPLE PRICING (Default View)
+  # ---------------------------------------------------------------------------
+  simple_pricing:
+    description: "One price per question - generous limits"
+    
+    tiers:
+      quick:
+        name: "Quick"
+        price: "$0.15"
+        max_input_tokens: 4000
+        max_output_tokens: 4000
+        word_limits:
+          input: "~3,000 words"
+          output: "~3,000 words"
+        our_cost: 0.046
+        margin: "69%"
+        use_case: "Simple questions, quick lookups"
+        
+      standard:
+        name: "Standard"
+        price: "$0.25"
+        max_input_tokens: 8000
+        max_output_tokens: 6000
+        word_limits:
+          input: "~6,000 words"
+          output: "~4,500 words"
+        our_cost: 0.053
+        margin: "79%"
+        use_case: "Most queries - generous depth"
+        default: true
+        
+      deep:
+        name: "Deep Analysis"
+        price: "$0.50"
+        max_input_tokens: 12000
+        max_output_tokens: 10000
+        word_limits:
+          input: "~9,000 words"
+          output: "~7,500 words"
+        our_cost: 0.073
+        margin: "85%"
+        use_case: "Detailed analysis, long documents"
+        
+      comprehensive:
+        name: "Comprehensive"
+        price: "$1.00"
+        max_input_tokens: 20000
+        max_output_tokens: 15000
+        word_limits:
+          input: "~15,000 words"
+          output: "~11,250 words"
+        our_cost: 0.104
+        margin: "90%"
+        use_case: "Maximum depth, full document analysis"
+
+  # ---------------------------------------------------------------------------
+  # TOKEN-BASED PRICING (Power User Toggle)
+  # ---------------------------------------------------------------------------
+  token_pricing:
+    description: "Granular control for power users"
+    visibility: "Settings → Show token usage"
+    
+    rates:
+      input_per_1k: 0.005     # $0.005 per 1K input
+      output_per_1k: 0.015    # $0.015 per 1K output
+      
+    cost_basis:
+      our_input_per_1k: 0.001175
+      our_output_per_1k: 0.00425
+      input_margin: "77%"
+      output_margin: "72%"
+      
+    minimum_charge: 0.03
+    
+    formula: |
+      Cost = max($0.03, (input_tokens/1000 × $0.005) + (output_tokens/1000 × $0.015))
+      
+    examples:
+      - scenario: "Free tier equivalent (1K/1.5K)"
+        calculation: "(1 × $0.005) + (1.5 × $0.015) = $0.0275"
+        charged: "$0.03 (minimum)"
+        our_cost: "$0.008"
+        margin: "73%"
+        
+      - scenario: "Standard equivalent (8K/6K)"
+        calculation: "(8 × $0.005) + (6 × $0.015) = $0.13"
+        charged: "$0.13"
+        our_cost: "$0.053"
+        margin: "59%"
+        
+      - scenario: "Deep equivalent (12K/10K)"
+        calculation: "(12 × $0.005) + (10 × $0.015) = $0.21"
+        charged: "$0.21"
+        our_cost: "$0.073"
+        margin: "65%"
+
+  # ---------------------------------------------------------------------------
+  # CREDIT PACKS (Prepaid Bonus)
+  # ---------------------------------------------------------------------------
+  credit_packs:
+    description: "Buy credits, get bonus"
+    
+    packs:
+      starter:
+        price: "$5"
+        credits: "$5.50"
+        bonus: "10%"
+        equivalent_standard_queries: 22
+        
+      value:
+        price: "$20"
+        credits: "$24"
+        bonus: "20%"
+        equivalent_standard_queries: 96
+        
+      power:
+        price: "$50"
+        credits: "$65"
+        bonus: "30%"
+        equivalent_standard_queries: 260
+        
+    terms:
+      expiry: "Credits never expire"
+      refund: "Unused credits refundable within 30 days"
+
+# =============================================================================
+# TIER 3: SUBSCRIPTIONS
+# =============================================================================
+subscriptions:
+
+  # ---------------------------------------------------------------------------
+  # LITE
+  # ---------------------------------------------------------------------------
+  lite:
+    name: "Lite"
+    price_monthly: "$19"
+    price_annual: "$180"
+    
+    limits:
+      queries_per_month: 200
+      queries_per_day: 15
+      max_input_tokens: 6000
+      max_output_tokens: 4000
+      
+    word_limits:
+      input: "~4,500 words"
+      output: "~3,000 words"
+      
+    economics:
+      cost_per_query: 0.041
+      max_monthly_cost: 8.20
+      revenue: 19.00
+      worst_case_margin: "57%"
+      typical_margin: "78%"     # At 50% usage
+      
+    value_proposition:
+      equivalent_ppq: "$0.095/query"
+      vs_standard: "62% savings vs $0.25"
+      
+    features:
+      - "Everything in Free"
+      - "200 queries/month"
+      - "Extended input (6K tokens)"
+      - "30-day query history"
+      - "Email support"
+      
+    target: "Regular users, 5-10 queries/day"
+
+  # ---------------------------------------------------------------------------
+  # PRO
+  # ---------------------------------------------------------------------------
+  pro:
+    name: "Pro"
+    price_monthly: "$49"
+    price_annual: "$470"
+    
+    limits:
+      queries_per_month: 600
+      queries_per_day: 30
+      max_input_tokens: 10000
+      max_output_tokens: 8000
+      
+    word_limits:
+      input: "~7,500 words"
+      output: "~6,000 words"
+      
+    economics:
+      cost_per_query: 0.063
+      max_monthly_cost: 37.80
+      revenue: 49.00
+      worst_case_margin: "23%"
+      typical_margin: "69%"     # At 40% usage
+      
+    value_proposition:
+      equivalent_ppq: "$0.082/query"
+      vs_standard: "67% savings vs $0.25"
+      
+    features:
+      - "Everything in Lite"
+      - "600 queries/month"
+      - "Deep input (10K tokens)"
+      - "Extended output (8K tokens)"
+      - "90-day query history"
+      - "API access (100 calls/day)"
+      - "Priority support"
+      
+    target: "Professionals, researchers, consultants"
+
+  # ---------------------------------------------------------------------------
+  # BUSINESS
+  # ---------------------------------------------------------------------------
+  business:
+    name: "Business"
+    price_monthly: "$149"
+    price_annual: "$1,430"
+    
+    limits:
+      queries_per_month: 2500
+      queries_per_day: 125
+      max_input_tokens: 15000
+      max_output_tokens: 12000
+      
+    word_limits:
+      input: "~11,250 words"
+      output: "~9,000 words"
+      
+    economics:
+      cost_per_query: 0.082
+      max_monthly_cost: 205.00
+      revenue: 149.00
+      worst_case_margin: "-38%"   # LOSS at 100% usage
+      typical_margin: "54%"       # At 35% usage (875 queries)
+      break_even_usage: "73%"     # 1817 queries
+      
+    value_proposition:
+      equivalent_ppq: "$0.060/query"
+      vs_standard: "76% savings vs $0.25"
+      
+    features:
+      - "Everything in Pro"
+      - "2,500 queries/month"
+      - "Maximum input (15K tokens)"
+      - "Extended output (12K tokens)"
+      - "1-year query history"
+      - "API access (500 calls/day)"
+      - "Team accounts (up to 5)"
+      - "Audit trail"
+      - "Dedicated support"
+      
+    target: "Small teams, law firms, research groups"
+    
+    risk_note: |
+      Business tier can lose money at high usage.
+      Mitigations:
+      1. Most business users at 30-40% usage
+      2. High-usage users often upgrade to Enterprise
+      3. Value of team accounts justifies risk
+
+  # ---------------------------------------------------------------------------
+  # ENTERPRISE
+  # ---------------------------------------------------------------------------
+  enterprise:
+    name: "Enterprise"
+    price: "Custom"
+    contact: "enterprise@seekrates.ai"
+    
+    features:
+      - "Unlimited queries"
+      - "Custom token limits"
+      - "SSO integration"
+      - "Dedicated account manager"
+      - "SLA (99.9% uptime)"
+      - "White-label options"
+      - "On-premise deployment"
+      - "Custom model selection"
+      - "Premium models available"
+      
+    pricing_guidance:
+      minimum_annual: "$10,000"
+      typical_range: "$15,000 - $50,000/year"
+      factors:
+        - "Expected query volume"
+        - "Token limit requirements"
+        - "Support level"
+        - "Integration complexity"
+
+# =============================================================================
+# FEATURE COMPARISON MATRIX
+# =============================================================================
+feature_matrix:
+  headers: ["Feature", "Free", "PAYG", "Lite $19", "Pro $49", "Business $149"]
+  
+  rows:
+    - feature: "AI Models"
+      values: ["5", "5", "5", "5", "5"]
+      
+    - feature: "Queries"
+      values: ["100/mo", "Unlimited", "200/mo", "600/mo", "2,500/mo"]
+      
+    - feature: "Input Tokens"
+      values: ["1K", "Up to 20K", "6K", "10K", "15K"]
+      
+    - feature: "Output Tokens"
+      values: ["1.5K", "Up to 15K", "4K", "8K", "12K"]
+      
+    - feature: "Cost per Query"
+      values: ["Free", "$0.15-1.00", "$0.095", "$0.082", "$0.060"]
+      
+    - feature: "API Access"
+      values: ["No", "No", "No", "100/day", "500/day"]
+      
+    - feature: "History"
+      values: ["7 days", "30 days", "30 days", "90 days", "1 year"]
+      
+    - feature: "Team Accounts"
+      values: ["No", "No", "No", "No", "5 users"]
+
+# =============================================================================
+# PROFITABILITY ANALYSIS
+# =============================================================================
+profitability:
+  
+  payg_always_profitable:
+    quick: { margin: "69%", status: "✅" }
+    standard: { margin: "79%", status: "✅" }
+    deep: { margin: "85%", status: "✅" }
+    comprehensive: { margin: "90%", status: "✅" }
+    
+  subscription_analysis:
+    lite:
+      worst_case: "57% margin"
+      typical: "78% margin"
+      status: "✅ SAFE"
+      
+    pro:
+      worst_case: "23% margin"
+      typical: "69% margin"
+      status: "✅ SAFE"
+      
+    business:
+      worst_case: "-38% margin (LOSS)"
+      typical: "54% margin"
+      break_even: "73% usage"
+      status: "⚠️ MONITOR"
+      mitigation: "Enterprise upsell for heavy users"
+
+# =============================================================================
+# LAUNCH TIMELINE
+# =============================================================================
+launch_timeline:
+  phase_1_testing:
+    dates: "Dec 15-31, 2025"
+    actions:
+      - "Deploy Path B models"
+      - "Monitor costs daily"
+      - "Track telemetry"
+      - "Compare to baseline"
+      
+  phase_2_review:
+    date: "Jan 2, 2026"
+    decision_criteria:
+      - "Cost savings >50%"
+      - "No quality degradation"
+      - "No user complaints"
+      
+  phase_3_launch:
+    date: "After Jan 2 review"
+    actions:
+      - "Enable PAYG registration"
+      - "Launch subscription signups"
+      - "Marketing campaign"
+
+# =============================================================================
+# VERSION HISTORY
+# =============================================================================
+version_history:
+  - version: "4.0.0"
+    date: "2025-12-14"
+    changes:
+      - "Path B models for 70%+ cost reduction"
+      - "PAYG with generous token limits (up to 20K/15K)"
+      - "Token-based pricing option for power users"
+      - "Revised subscription limits for profitability"
+      - "Credit packs with bonus structure"
+      
+  - version: "3.0.0"
+    date: "2025-12-14"
+    changes:
+      - "Initial PAYG proposal (not implemented)"
+      
+  - version: "2.0.0"
+    date: "2025-12-09"
+    changes:
+      - "Previous pricing structure"
+
+# =============================================================================
+# END OF PRICING TIERS v4.0.0
+# =============================================================================

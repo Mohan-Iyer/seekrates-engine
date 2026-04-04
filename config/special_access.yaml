@@ -1,0 +1,80 @@
+# =============================================================================
+# SEEKRATES AI - SPECIAL ACCESS CONFIGURATION
+# =============================================================================
+# File: config/special_access.yaml
+# Version: 1.3.0
+# Updated: 2026-01-29
+# Purpose: Whitelist for special access tiers (bypasses standard limits)
+# =============================================================================
+special_access:
+
+  # ---------------------------------------------------------------------------
+  # OWNER ACCESS
+  # ---------------------------------------------------------------------------
+  - email: "mohan@pixels.net.nz"
+    tier: "sage"
+    reason: "Owner - full access"
+    granted_date: "2026-01-06"
+    granted_by: "mohan@pixels.net.nz"
+
+  - email: "mohan.k.iyer@icloud.com"
+    tier: "sage"
+    reason: "Owner - full access"
+    granted_date: "2026-01-06"
+    granted_by: "mohan@pixels.net.nz"
+
+  - email: "gita@pixels.net.nz"
+    tier: "sage"
+    reason: "Owner - full access"
+    granted_date: "2026-01-06"
+    granted_by: "mohan@pixels.net.nz"
+
+  - email: "mohan@seekrates-ai.com"
+    tier: "sage"
+    reason: "Admin/founder - unlimited access"
+    granted_date: "2026-01-29"
+    granted_by: "mohan@pixels.net.nz"
+
+  - email: "veeyemdee@gmail.com"
+    tier: "oracle"
+    reason: "Guest - full access"
+    granted_date: "2026-01-06"
+    granted_by: "mohan@pixels.net.nz"
+
+  # ---------------------------------------------------------------------------
+  # PUBLISHER ACCESS
+  # ---------------------------------------------------------------------------
+  - email: "seekrates.publisher@gmail.com"
+    tier: "sage"
+    daily_queries: 999999
+    monthly_queries: 999999
+    reason: "seekrates_publisher automation - blog content pipeline (full features)"
+    granted_date: "2026-01-09"
+    granted_by: "mohan@pixels.net.nz"
+
+  # ---------------------------------------------------------------------------
+  # FAMILY ACCESS
+  # ---------------------------------------------------------------------------
+  - email: "gitazz@yahoo.com"
+    tier: "free"
+    max_input_tokens: 10000
+    max_output_tokens: 15000
+    daily_queries: 5
+    monthly_queries: 100
+    reason: "Family access"
+    granted_date: "2025-12-14"
+    granted_by: "mohan@pixels.net.nz"
+
+  - email: "shan.iyerr@gmail.com"
+    tier: "free"
+    max_input_tokens: 10000
+    max_output_tokens: 15000
+    daily_queries: 5
+    monthly_queries: 100
+    reason: "Family access"
+    granted_date: "2025-12-14"
+    granted_by: "mohan@pixels.net.nz"
+
+# =============================================================================
+# END OF SPECIAL ACCESS
+# =============================================================================

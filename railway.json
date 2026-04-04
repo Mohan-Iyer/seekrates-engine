@@ -1,0 +1,8 @@
+{
+  "build": {"builder": "NIXPACKS"},
+  "deploy": {
+    "startCommand": "python3 src/server/main.py",
+    "restartPolicyType": "ON_FAILURE"
+  },
+  "cacheVersion": "20251028_143022"
+}
