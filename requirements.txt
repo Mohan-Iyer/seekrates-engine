@@ -1,0 +1,62 @@
+# =============================================================================
+# Seekrates AI - Production Dependencies (Railway Deployment)
+# Python 3.11+ compatible - ALL CONFLICTS RESOLVED
+# =============================================================================
+
+# Core Web Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.9
+
+# Data Validation
+pydantic==2.6.0
+email-validator==2.1.1
+
+# HTTP Clients (async)
+httpx==0.25.2
+aiohttp>=3.9.0
+
+
+# Database & Caching
+sqlalchemy==2.0.25
+aiosqlite==0.19.0
+# psycopg2-binary==2.9.9 Commented out 2025_11_18
+
+# Email & Templates
+jinja2==3.1.3
+
+# Configuration & Utilities
+python-dotenv==1.0.0
+pyyaml==6.0.1
+requests==2.31.0
+
+# Resend 
+resend>=2.0.0
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+cryptography>=41.0.0
+
+# Production Server
+gunicorn==21.2.0
+
+# AWS Integration
+boto3==1.34.162
+# Stripe
+stripe>=7.0.0
+
+
+# =============================================================================
+# CONSENSUS ENGINE DEPENDENCIES
+# =============================================================================
+
+# Phase 1: Weighted Voting (ACTIVE)
+# pyyaml==6.0.1  # Already included above - no additional deps needed!
+
+# =============================================================================
+# NOTES:
+# - Phase 1 (Weighted Voting) requires NO new dependencies
+# - Phase 2 (Similarity) will add ~2.5GB to deployment (torch + models)
+# - Consider Railway resource limits when enabling Phase 2
+# =============================================================================

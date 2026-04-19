@@ -1,0 +1,237 @@
+# =============================================================================
+# SEEKRATES AI - TIER PROCESSING CONFIGURATION
+# =============================================================================
+# File: config/tier_processing.yaml
+# Version: 1.0.0
+# Created: 2026-01-09
+# Author: C-C Sprint 1 (Session 85)
+# Purpose: Controls synthesis behavior and output per tier
+# =============================================================================
+
+metadata:
+  version: "1.0.0"
+  created: "2026-01-09"
+  author: "C-C Sprint 1"
+  session: "85"
+
+# =============================================================================
+# CRITICAL RULE
+# =============================================================================
+# Provider responses (5 LLMs) are NEVER modified for brevity.
+# Only synthesis output respects tier token limits.
+# This preserves raw material integrity across all tiers.
+# =============================================================================
+
+tiers:
+
+  # ---------------------------------------------------------------------------
+  # SEEKER (Free) - "What's the consensus?"
+  # ---------------------------------------------------------------------------
+  seeker:
+    synthesis_style: "concise"
+    synthesis_focus: "headline answer only"
+    max_synthesis_tokens: 500
+    
+    extract:
+      - "core_conclusion"
+      - "convergence_count"
+      - "convergence_percentage"
+      - "consensus_confidence"
+    
+    skip:
+      - "detailed_agreement_breakdown"
+      - "per_provider_analysis"
+      - "individual_response_formatting"
+    
+    output_sections:
+      - "synthesis_paragraph"
+      - "convergence_indicator"
+      - "confidence_level"
+      - "upgrade_cta"
+    
+    include_individual_responses: false
+    include_risk_analysis: false
+
+  # ---------------------------------------------------------------------------
+  # ACOLYTE ($9/month) - "How did they get there?"
+  # ---------------------------------------------------------------------------
+  acolyte:
+    synthesis_style: "comprehensive"
+    synthesis_focus: "full transparency with context"
+    max_synthesis_tokens: 1000
+    
+    extract:
+      - "core_conclusion"
+      - "convergence_count"
+      - "convergence_percentage"
+      - "consensus_confidence"
+      - "agreement_points"
+      - "divergence_points"
+      - "dissenting_provider"
+      - "dissent_summary"
+    
+    skip:
+      - "risk_analysis"
+      - "validation_checklist"
+    
+    output_sections:
+      - "synthesis_paragraph"
+      - "convergence_indicator"
+      - "confidence_level"
+      - "agreement_section"
+      - "divergence_section"
+      - "champion_highlight"
+      - "individual_responses"
+      - "upgrade_cta"
+    
+    include_individual_responses: true
+    include_risk_analysis: false
+
+  # ---------------------------------------------------------------------------
+  # ORACLE ($29/month) - "Can I trust this enough to act?"
+  # ---------------------------------------------------------------------------
+  oracle:
+    synthesis_style: "comprehensive"
+    synthesis_focus: "full analysis plus risk assessment"
+    max_synthesis_tokens: 1000
+    risk_pass_tokens: 800
+    
+    extract:
+      - "core_conclusion"
+      - "convergence_count"
+      - "convergence_percentage"
+      - "consensus_confidence"
+      - "agreement_points"
+      - "divergence_points"
+      - "dissenting_provider"
+      - "dissent_summary"
+      - "dissent_significance"
+    
+    additional_processing:
+      - "oracle_risk_analysis"
+    
+    output_sections:
+      - "synthesis_paragraph"
+      - "convergence_indicator"
+      - "confidence_level"
+      - "agreement_section"
+      - "divergence_section"
+      - "assumptions_section"
+      - "failure_modes_section"
+      - "contrarian_analysis_section"
+      - "oracle_recommendation_section"
+      - "validation_checklist_section"
+      - "champion_highlight"
+      - "individual_responses"
+      - "pdf_attachment"
+      - "upgrade_cta"
+    
+    include_individual_responses: true
+    include_risk_analysis: true
+
+  # ---------------------------------------------------------------------------
+  # SAGE ($149/month) - "How do I scale this?"
+  # ---------------------------------------------------------------------------
+  sage:
+    synthesis_style: "comprehensive"
+    synthesis_focus: "oracle plus export formats"
+    max_synthesis_tokens: 1200
+    risk_pass_tokens: 1000
+    
+    extract:
+      - "core_conclusion"
+      - "convergence_count"
+      - "convergence_percentage"
+      - "consensus_confidence"
+      - "agreement_points"
+      - "divergence_points"
+      - "dissenting_provider"
+      - "dissent_summary"
+      - "dissent_significance"
+    
+    additional_processing:
+      - "oracle_risk_analysis"
+      - "docx_generation"
+      - "api_response_formatting"
+    
+    output_sections:
+      - "synthesis_paragraph"
+      - "convergence_indicator"
+      - "confidence_level"
+      - "agreement_section"
+      - "divergence_section"
+      - "assumptions_section"
+      - "failure_modes_section"
+      - "contrarian_analysis_section"
+      - "oracle_recommendation_section"
+      - "validation_checklist_section"
+      - "champion_highlight"
+      - "individual_responses"
+      - "pdf_attachment"
+      - "docx_attachment"
+    
+    include_individual_responses: true
+    include_risk_analysis: true
+
+# =============================================================================
+# TOKEN BUDGET SUMMARY
+# =============================================================================
+token_budgets:
+  seeker:
+    synthesis: 500
+    risk_pass: 0
+    total: 500
+  acolyte:
+    synthesis: 1000
+    risk_pass: 0
+    total: 1000
+  oracle:
+    synthesis: 1000
+    risk_pass: 800
+    total: 1800
+  sage:
+    synthesis: 1200
+    risk_pass: 1000
+    total: 2200
+
+# =============================================================================
+# TIER FEATURE FLAGS (for code reference)
+# =============================================================================
+feature_flags:
+  seeker:
+    sees_synthesis: true
+    sees_individual_responses: false
+    sees_champion: false
+    sees_agreement_divergence: false
+    sees_risk_analysis: false
+    gets_pdf: false
+    
+  acolyte:
+    sees_synthesis: true
+    sees_individual_responses: true
+    sees_champion: true
+    sees_agreement_divergence: true
+    sees_risk_analysis: false
+    gets_pdf: false
+    
+  oracle:
+    sees_synthesis: true
+    sees_individual_responses: true
+    sees_champion: true
+    sees_agreement_divergence: true
+    sees_risk_analysis: true
+    gets_pdf: true
+    
+  sage:
+    sees_synthesis: true
+    sees_individual_responses: true
+    sees_champion: true
+    sees_agreement_divergence: true
+    sees_risk_analysis: true
+    gets_pdf: true
+    gets_docx: true
+    gets_api: true
+
+# =============================================================================
+# END OF CONFIGURATION
+# =============================================================================

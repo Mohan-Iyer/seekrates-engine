@@ -1,0 +1,742 @@
+# =============================================================================
+# SEEKRATES AI - SYSTEM CONFIGURATION
+# =============================================================================
+# File: config/system.yaml
+# Version: 4.0.0
+# Updated: 2025-12-14
+# Author: D-C (Designer Claude)
+# Change: PATH B - All cheaper models for cost optimization
+# =============================================================================
+
+# =============================================================================
+# VERSION HISTORY
+# =============================================================================
+# v4.0.0 (2025-12-14): PATH B - Switched all providers to cheaper models
+#   - OpenAI: gpt-4-turbo → gpt-4o-mini (95% savings)
+#   - Claude: claude-sonnet-4-5 → claude-3-haiku-20240307 (73% savings)
+#   - Gemini: gemini-2.0-flash (kept - already cheapest)
+#   - Mistral: mistral-large-latest → mistral-small-latest (80% savings)
+#   - Cohere: command-r-plus → command-r (85% savings)
+#   - Synthesis: KEPT on claude-sonnet-4-5-20250929 (quality matters)
+# v3.2.0 (2025-12-09): Model switch Opus → Sonnet
+# v3.1.0 (2025-11-15): Added synthesis configuration
+# v3.0.0 (2025-10-21): Production deployment
+# =============================================================================
+
+# =============================================================================
+# APPLICATION SETTINGS
+# =============================================================================
+app:
+  name: "Seekrates AI"
+  version: "1.0.0"
+  environment: "production"
+  debug: false
+  
+# =============================================================================
+# SERVER CONFIGURATION
+# =============================================================================
+server:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  timeout: 60
+
+# =============================================================================
+# AGENT CONFIGURATION - PATH B (COST-OPTIMIZED)
+# =============================================================================
+agents:
+  # Number of providers to query per consensus request
+  panel_size: 5
+  
+  # Timeout for individual provider calls (seconds)
+  timeout: 30
+  
+  # Retry configuration
+  retry:
+    max_attempts: 3
+    backoff_multiplier: 2
+    initial_delay: 1
+  
+  # ---------------------------------------------------------------------------
+  # PROVIDER CONFIGURATIONS - PATH B (Cheaper Models)
+  # ---------------------------------------------------------------------------
+  providers:
+    
+    # -------------------------------------------------------------------------
+    # OPENAI - GPT-3.5 Turbo (was GPT-4 Turbo)
+    # -------------------------------------------------------------------------
+    # Cost: $0.50/$1.50 per 1M (was $10/$30) - 95% SAVINGS
+    # -------------------------------------------------------------------------
+    openai:
+      enabled: true
+      model: "gpt-4o-mini"
+      # Previous: "gpt-4-turbo"
+      # Fallback if needed: "gpt-4o-mini-0125"
+      endpoint: "https://api.openai.com/v1/chat/completions"
+      max_tokens: 2048
+      temperature: 0.7
+      pricing:
+        input_per_mtok: 0.50
+        output_per_mtok: 1.50
+      notes: |
+        PATH B switch 2025-12-14. GPT-3.5 is sufficient for consensus panel.
+        Quality differences will show in telemetry - this is by design.
+        If consistently underperforms, consensus voting will reflect it.
+    
+    # -------------------------------------------------------------------------
+    # CLAUDE - Haiku 3 (was Sonnet 4.5)
+    # -------------------------------------------------------------------------
+    # Cost: $0.25/$1.25 per 1M (was $3/$15) - 92% SAVINGS
+    # -------------------------------------------------------------------------
+    claude:
+      enabled: true
+      model: "claude-3-haiku-20240307"
+      # Previous: "claude-sonnet-4-5-20250929"
+      # Note: Synthesis still uses Sonnet - see synthesis section below
+      endpoint: "https://api.anthropic.com/v1/messages"
+      api_version: "2023-06-01"
+      max_tokens: 2048
+      temperature: 0.7
+      pricing:
+        input_per_mtok: 0.25
+        output_per_mtok: 1.25
+      notes: |
+        PATH B switch 2025-12-14. Haiku for consensus panel only.
+        Synthesis remains on Sonnet for quality.
+    
+    # -------------------------------------------------------------------------
+    # GEMINI - Flash (already cheapest)
+    # -------------------------------------------------------------------------
+    # Cost: $0.075/$0.30 per 1M - NO CHANGE (already optimized)
+    # -------------------------------------------------------------------------
+    gemini:
+      enabled: true
+      model: "gemini-2.0-flash"
+      # Already on Flash since Session 59
+      endpoint: "https://generativelanguage.googleapis.com/v1beta/models"
+      max_tokens: 2048
+      temperature: 0.7
+      pricing:
+        input_per_mtok: 0.075
+        output_per_mtok: 0.30
+      notes: |
+        Already on cheapest model. No change needed.
+        URL format: {endpoint}/{model}:generateContent
+    
+    # -------------------------------------------------------------------------
+    # MISTRAL - Small (was Large)
+    # -------------------------------------------------------------------------
+    # Cost: $0.20/$0.60 per 1M (was $2/$6) - 90% SAVINGS
+    # -------------------------------------------------------------------------
+    mistral:
+      enabled: true
+      model: "mistral-small-latest"
+      # Previous: "mistral-large-latest"
+      # Alternative: "mistral-small-2409"
+      endpoint: "https://api.mistral.ai/v1/chat/completions"
+      max_tokens: 2048
+      temperature: 0.3
+      pricing:
+        input_per_mtok: 0.20
+        output_per_mtok: 0.60
+      notes: |
+        PATH B switch 2025-12-14. Small model sufficient for consensus.
+        Large available as fallback if quality issues arise.
+    
+    # -------------------------------------------------------------------------
+    # COHERE - Command R (was Command R+)
+    # -------------------------------------------------------------------------
+    # Cost: $0.15/$0.60 per 1M (was $2.50/$10) - 94% SAVINGS
+    # -------------------------------------------------------------------------
+    cohere:
+      enabled: true
+      model: "command-r-08-2024"
+      # Previous: "command-r-plus"
+      # Note: Using v2 API endpoint
+      endpoint: "https://api.cohere.com/v2/chat"
+      max_tokens: 2048
+      temperature: 0.3
+      pricing:
+        input_per_mtok: 0.15
+        output_per_mtok: 0.60
+      notes: |
+        PATH B switch 2025-12-14. Command R for consensus panel.
+        R+ available for premium tier if implemented.
+
+# =============================================================================
+# SYNTHESIS CONFIGURATION - KEPT ON SONNET (Quality Critical)
+# =============================================================================
+synthesis:
+  enabled: true
+  model: "claude-sonnet-4-5-20250929"
+  # NOT DOWNGRADED - Synthesis quality directly affects user perception
+  max_tokens: 2000
+  temperature: 0.3
+  pricing:
+    input_per_mtok: 3.00
+    output_per_mtok: 15.00
+  notes: |
+    Decision: Keep synthesis on Sonnet despite Path B.
+    Rationale: Synthesis generates the consensus panel HTML that users see.
+    This single call (~$0.008/query) is worth the quality.
+
+# =============================================================================
+# COMBINED COST MODEL - PATH B
+# =============================================================================
+cost_model:
+  version: "4.0.0"
+  effective_date: "2025-12-14"
+  
+  # Per 1M tokens (all 5 providers combined)
+  combined_rates:
+    input_per_mtok: 1.175   # 0.50 + 0.25 + 0.075 + 0.20 + 0.15
+    output_per_mtok: 4.25   # 1.50 + 1.25 + 0.30 + 0.60 + 0.60
+    
+  # Per 1K tokens
+  per_1k_tokens:
+    input: 0.001175
+    output: 0.00425
+    
+  # Cost per typical query (3K in, 2K out)
+  typical_query_cost: 0.012   # (3 × 0.001175) + (2 × 0.00425)
+  
+  # With synthesis (~500 in, 1000 out on Sonnet)
+  synthesis_cost: 0.0165      # (0.5 × 0.003) + (1 × 0.015)
+  
+  # Total per consensus query
+  total_per_query: 0.0285     # typical_query_cost + synthesis_cost
+  
+  comparison_to_v3:
+    v3_total_per_query: 0.065
+    v4_total_per_query: 0.029
+    savings_percentage: "55%"
+
+# =============================================================================
+# EMAIL CONFIGURATION
+# =============================================================================
+email:
+  provider: "smtp"  # "ses" for production, "smtp" for dev/fallback
+  smtp:
+    host: "smtp.gmail.com"
+    port: 587
+    use_tls: true
+  ses:
+    region: "ap-southeast-2"
+    # Pending production access approval
+
+# =============================================================================
+# SECURITY
+# =============================================================================
+security:
+  # API keys loaded from environment variables
+  api_key_env_vars:
+    openai: "OPENAI_API_KEY"
+    claude: ["ANTHROPIC_API_KEY", "CLAUDE_API_KEY"]
+    gemini: "GEMINI_API_KEY"
+    mistral: "MISTRAL_API_KEY"
+    cohere: "COHERE_API_KEY"
+  
+  # Safety injection
+  safety_prime:
+    s3_url: "https://seekrates-prime.s3.ap-southeast-2.amazonaws.com/SAFETY_PRIME.yaml"
+    local_fallback: "docs/flow_control/SAFETY_PRIME.yaml"
+
+# =============================================================================
+# FEATURE FLAGS
+# =============================================================================
+features:
+  synthesis_enabled: true
+  consensus_panel_enabled: true
+  email_delivery_enabled: true
+  telemetry_enabled: true
+  
+# =============================================================================
+# TELEMETRY
+# =============================================================================
+telemetry:
+  enabled: true
+  database: "sqlite:///telemetry.db"
+  retention_days: 90
+  
+  # Track for Path B comparison
+  track_fields:
+    - provider
+    - model
+    - input_tokens
+    - output_tokens
+    - latency_ms
+    - champion_selected
+    - consensus_score
+# =============================================================================
+# SPECIFICATION: TIER SYSTEM REFACTORING v4.1.0
+# =============================================================================
+# Document: tier_system_refactoring_spec.yaml
+# Version: 1.0.0
+# Created: 2026-01-04
+# Author: D-C (Designer Claude)
+# Status: APPROVED - Ready for C-C Implementation
+# Session: 81
+# =============================================================================
+
+metadata:
+  spec_id: "SPEC-81-001"
+  title: "Tier System Refactoring for v4.1.0 Marketing Strategy"
+  purpose: "Implement differentiated response formatting per pricing tier"
+  source: "plans/seekrates_unified_marketing_strategy.yaml v4.1.0"
+  
+  references:
+    - "config/system.yaml (to be updated)"
+    - "src/billing/stripe_integration.py"
+    - "src/api/auth_endpoints.py"
+    - "templates/pricing.html"
+    - "docs/seekrates_pricing_policy.yaml"
+
+# =============================================================================
+# BUSINESS REQUIREMENTS
+# =============================================================================
+
+business_requirements:
+
+  BR-001:
+    title: "Seeker Tier Response Limitation"
+    description: |
+      Free tier users receive abbreviated responses to create upgrade incentive
+      while still demonstrating product value.
+    acceptance_criteria:
+      - "Seeker receives one-paragraph synthesis (not full)"
+      - "Seeker does NOT see individual LLM responses"
+      - "Seeker DOES see dissenting view (unique value demo)"
+      - "Monthly limit: 100 queries (not 5/day)"
+      - "Counter displayed: 'X of 100 queries remaining this month'"
+  
+  BR-002:
+    title: "Acolyte Tier Response Truncation"
+    description: |
+      Entry-level paid tier receives more detail than Seeker but less than Oracle.
+      Positioned as "L2-Lite" for professionals not yet advising others.
+    acceptance_criteria:
+      - "Acolyte receives detailed synthesis"
+      - "Acolyte sees individual LLM responses (truncated to 500 chars each)"
+      - "Acolyte sees dissenting view"
+      - "Monthly limit: 100 queries"
+  
+  BR-003:
+    title: "Oracle Tier Full Access"
+    description: |
+      Professional tier receives full responses with document upload capability.
+    acceptance_criteria:
+      - "Oracle receives full synthesis"
+      - "Oracle sees full individual LLM responses (no truncation)"
+      - "Oracle can upload documents (10 pages)"
+      - "Oracle receives PDF report attachments"
+      - "Monthly limit: 300 queries"
+  
+  BR-004:
+    title: "Sage Tier Waitlist"
+    description: |
+      Enterprise tier not yet available for purchase. Convert to waitlist
+      with competition for early adopters.
+    acceptance_criteria:
+      - "Sage 'Unlock Full Power' button → 'Join Waitlist'"
+      - "Display: 'Coming Q2 2026'"
+      - "Display: 'First 100 innovators get 1 year free'"
+      - "Form collects: email + 'How would you use Sage?'"
+      - "Checkout endpoint returns waitlist response (not Stripe redirect)"
+
+# =============================================================================
+# TECHNICAL SPECIFICATION
+# =============================================================================
+
+technical_spec:
+
+  # ---------------------------------------------------------------------------
+  # CONFIG STRUCTURE (system.yaml)
+  # ---------------------------------------------------------------------------
+  config_structure:
+    
+    location: "config/system.yaml"
+    section: "tiers"
+    
+    schema:
+      tier_code:
+        type: "string"
+        values: ["SEK", "AKO", "ORA", "SAG"]
+      
+      limits:
+        queries_per_month: "integer"
+        queries_per_day: "integer | null"
+        query_length_chars: "integer"
+        document_upload: "boolean"
+        document_pages: "integer"
+      
+      response_features:
+        synthesis_format: "enum: brief | one_paragraph | detailed | full"
+        show_individual_llm: "boolean"
+        llm_response_truncate: "integer | null (chars)"
+        show_dissenting_view: "boolean"
+        pdf_report: "boolean"
+        docx_export: "boolean"
+      
+      status: "enum: active | waitlist | disabled"
+      
+      waitlist:  # Only for Sage
+        cta_text: "string"
+        launch_date: "string"
+        competition: "string"
+
+  # ---------------------------------------------------------------------------
+  # RESPONSE FORMATTING LOGIC
+  # ---------------------------------------------------------------------------
+  response_formatting:
+    
+    module: "src/utils/tier_response_formatter.py"
+    
+    function_signature: |
+      def format_response_for_tier(
+          consensus_result: ConsensusResult,
+          tier: str
+      ) -> FormattedResponse:
+          """
+          Apply tier-specific formatting to consensus result.
+          
+          Args:
+              consensus_result: Full consensus output from engine
+              tier: User's tier code (SEK, AKO, ORA, SAG)
+          
+          Returns:
+              FormattedResponse with tier-appropriate content
+          """
+    
+    synthesis_format_rules:
+      brief:
+        description: "Single sentence summary"
+        max_chars: 200
+        use_case: "Not currently used"
+      
+      one_paragraph:
+        description: "3-5 sentence summary with key finding"
+        max_chars: 600
+        use_case: "Seeker tier"
+        implementation: |
+          Extract first paragraph of synthesis, or
+          Use LLM to generate brief summary if synthesis is structured
+      
+      detailed:
+        description: "Full synthesis without appendices"
+        max_chars: 2000
+        use_case: "Acolyte tier"
+      
+      full:
+        description: "Complete synthesis with all sections"
+        max_chars: null
+        use_case: "Oracle, Sage tiers"
+    
+    llm_response_truncation:
+      method: "Truncate at word boundary near limit"
+      suffix: "... [upgrade to see full response]"
+      
+      implementation: |
+        def truncate_response(text: str, max_chars: int) -> str:
+            if len(text) <= max_chars:
+                return text
+            # Find last space before limit
+            truncate_point = text.rfind(' ', 0, max_chars - 40)
+            if truncate_point == -1:
+                truncate_point = max_chars - 40
+            return text[:truncate_point] + "... [upgrade to see full response]"
+
+  # ---------------------------------------------------------------------------
+  # EMAIL OUTPUT CHANGES
+  # ---------------------------------------------------------------------------
+  email_changes:
+    
+    file: "src/utils/email_notifier.py"
+    
+    changes:
+      - location: "send_formatted_result()"
+        change: "Accept tier parameter, apply formatting before sending"
+      
+      - location: "HTML template generation"
+        change: |
+          Seeker: Hide individual LLM responses section
+          Acolyte: Show LLM responses with truncation notice
+          Oracle+: Show full LLM responses
+    
+    new_html_sections:
+      
+      seeker_upgrade_prompt:
+        location: "After synthesis, before footer"
+        content: |
+          <div class="upgrade-prompt">
+            <p>Want to see what each AI said individually?</p>
+            <a href="https://app.seekrates-ai.com/pricing">Upgrade to Acolyte →</a>
+          </div>
+      
+      acolyte_truncation_notice:
+        location: "After each truncated LLM response"
+        content: |
+          <span class="truncation-notice">
+            ... [upgrade to Oracle for full responses]
+          </span>
+
+  # ---------------------------------------------------------------------------
+  # PRICING PAGE CHANGES
+  # ---------------------------------------------------------------------------
+  pricing_page:
+    
+    file: "templates/pricing.html"
+    
+    changes:
+      
+      seeker_card:
+        current: "5 queries per day"
+        new: "100 queries per month"
+        add: "Brief consensus summary"
+        add: "Upgrade prompt in results"
+      
+      sage_card:
+        current_button: "Unlock Full Power"
+        new_button: "Join Waitlist"
+        add_badge: "Coming Q2 2026"
+        add_text: "First 100 innovators get 1 year free"
+        
+        waitlist_form:
+          fields:
+            - name: "email"
+              type: "email"
+              required: true
+              placeholder: "your@email.com"
+            
+            - name: "use_case"
+              type: "textarea"
+              required: true
+              placeholder: "How would you use Sage? Describe your team, use case, or research goals..."
+          
+          submit_endpoint: "/api/v1/billing/sage-waitlist"
+          success_message: "You're on the list! We'll notify you when Sage launches."
+
+  # ---------------------------------------------------------------------------
+  # DATABASE CHANGES
+  # ---------------------------------------------------------------------------
+  database:
+    
+    new_table: "sage_waitlist"
+    
+    schema:
+      id: "INTEGER PRIMARY KEY AUTOINCREMENT"
+      email: "TEXT NOT NULL"
+      use_case: "TEXT NOT NULL"
+      created_at: "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+      notified: "BOOLEAN DEFAULT FALSE"
+    
+    location: "telemetry.db (same as customers/subscriptions)"
+
+  # ---------------------------------------------------------------------------
+  # API ENDPOINT CHANGES
+  # ---------------------------------------------------------------------------
+  api_changes:
+    
+    new_endpoint:
+      path: "/api/v1/billing/sage-waitlist"
+      method: "POST"
+      body:
+        email: "string (required)"
+        use_case: "string (required)"
+      response:
+        success: { "status": "waitlisted", "message": "..." }
+        error: { "status": "error", "message": "..." }
+    
+    modified_endpoint:
+      path: "/api/v1/billing/create-checkout"
+      change: |
+        If tier == "SAG":
+          Return { "status": "waitlist", "redirect": "/pricing#sage-waitlist" }
+        Instead of creating Stripe checkout session
+
+# =============================================================================
+# FILE CHANGE SUMMARY
+# =============================================================================
+
+file_changes:
+
+  new_files:
+    - path: "src/utils/tier_response_formatter.py"
+      purpose: "Response formatting logic per tier"
+      lines_estimate: 100
+    
+    - path: "docs/tier_system_refactoring_spec.yaml"
+      purpose: "This specification document"
+  
+  modified_files:
+    - path: "config/system.yaml"
+      changes: "Add tiers: section with full config"
+      lines_added: ~80
+    
+    - path: "templates/pricing.html"
+      changes: "Seeker 100/mo, Sage waitlist form"
+      lines_modified: ~50
+    
+    - path: "src/utils/email_notifier.py"
+      changes: "Tier-aware response formatting"
+      lines_modified: ~30
+    
+    - path: "src/billing/stripe_integration.py"
+      changes: "Read TIER_CONFIG from system.yaml, waitlist logic"
+      lines_modified: ~40
+    
+    - path: "src/api/billing_endpoints.py"
+      changes: "Add /sage-waitlist endpoint"
+      lines_added: ~30
+    
+    - path: "src/api/auth_endpoints.py"
+      changes: "Pass tier to response formatter"
+      lines_modified: ~10
+
+# =============================================================================
+# TESTING REQUIREMENTS
+# =============================================================================
+
+testing:
+
+  unit_tests:
+    - test: "test_tier_response_formatter.py"
+      cases:
+        - "Seeker gets one_paragraph synthesis"
+        - "Seeker does not get individual LLM responses"
+        - "Acolyte gets truncated LLM responses at 500 chars"
+        - "Oracle gets full responses"
+        - "Truncation adds upgrade suffix"
+  
+  integration_tests:
+    - test: "Submit query as Seeker, verify email format"
+    - test: "Submit query as Acolyte, verify truncation"
+    - test: "Submit query as Oracle, verify full response"
+    - test: "Click Sage upgrade, verify waitlist form appears"
+    - test: "Submit waitlist form, verify database entry"
+  
+  e2e_tests:
+    - test: "Full flow: Register → Query → Receive tier-appropriate email"
+    - test: "Upgrade Seeker → Acolyte, verify response change"
+
+# =============================================================================
+# IMPLEMENTATION ORDER
+# =============================================================================
+
+implementation_order:
+
+  sprint_1:
+    name: "Foundation + Frontend"
+    tasks:
+      - task: "Add tiers: to system.yaml"
+        owner: "Mohan (save)"
+        effort: "10 min"
+      
+      - task: "Update pricing.html (Seeker 100/mo, Sage waitlist)"
+        owner: "C-C"
+        effort: "1 hour"
+      
+      - task: "Create sage_waitlist table"
+        owner: "C-C"
+        effort: "15 min"
+      
+      - task: "Create /sage-waitlist endpoint"
+        owner: "C-C"
+        effort: "30 min"
+  
+  sprint_2:
+    name: "Response Formatting"
+    tasks:
+      - task: "Create tier_response_formatter.py"
+        owner: "C-C"
+        effort: "1.5 hours"
+      
+      - task: "Integrate with email_notifier.py"
+        owner: "C-C"
+        effort: "1 hour"
+      
+      - task: "Add upgrade prompts to email templates"
+        owner: "C-C"
+        effort: "30 min"
+  
+  sprint_3:
+    name: "Billing Integration"
+    tasks:
+      - task: "Update stripe_integration.py TIER_CONFIG"
+        owner: "C-C"
+        effort: "1 hour"
+      
+      - task: "Wire tier lookup → formatter in auth_endpoints.py"
+        owner: "C-C"
+        effort: "30 min"
+      
+      - task: "Test all tiers locally"
+        owner: "C-C"
+        effort: "1 hour"
+  
+  sprint_4:
+    name: "Deploy + Validate"
+    tasks:
+      - task: "Deploy to Railway"
+        owner: "Mohan"
+        effort: "30 min"
+      
+      - task: "Production validation per tier"
+        owner: "Mohan"
+        effort: "30 min"
+
+# =============================================================================
+# SUCCESS CRITERIA
+# =============================================================================
+
+success_criteria:
+
+  functional:
+    - "Seeker users receive one-paragraph synthesis only"
+    - "Seeker users do NOT see individual LLM responses"
+    - "Acolyte users see truncated LLM responses with upgrade prompt"
+    - "Oracle users see full responses"
+    - "Sage checkout redirects to waitlist form"
+    - "Waitlist submissions stored in database"
+  
+  non_functional:
+    - "Response formatting adds <100ms latency"
+    - "Config changes don't require code deployment (system.yaml)"
+    - "Tier limits are configurable without code changes"
+
+# =============================================================================
+# ROLLBACK PLAN
+# =============================================================================
+
+rollback:
+
+  trigger: "Critical bug affecting >10% of queries"
+  
+  steps:
+    - "Revert system.yaml tiers: section (remove response_features)"
+    - "Revert email_notifier.py to pre-formatting version"
+    - "Keep pricing.html changes (cosmetic, low risk)"
+  
+  rollback_time: "15 minutes"
+
+# =============================================================================
+# SIGN-OFF
+# =============================================================================
+
+sign_off:
+  spec_version: "1.0.0"
+  date: "2026-01-04"
+  author: "D-C (Designer Claude)"
+  approved_by: "Mohan Iyer"
+  
+  notes: |
+    This specification implements the v4.1.0 marketing strategy pricing changes.
+    Key insight: Free tier generosity (100/month) builds volume for L3 emergence.
+    Response differentiation creates upgrade incentive without crippling free tier.
+    
+    Sage waitlist + competition seeds early adopter community.
+    
+    DeepSeek integration deferred - noted in Mohan's calendar for future.
+
+# =============================================================================
+# END OF SPECIFICATION
+# =============================================================================
